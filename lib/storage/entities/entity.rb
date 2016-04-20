@@ -7,7 +7,6 @@ module Storage
 
       def initialize
         yield self if block_given?
-        freeze
       end
     end
   end

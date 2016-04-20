@@ -7,11 +7,19 @@ module Storage
         self.factory = factory
       end
 
-      def load(record)
-        factory.call do |item|
-          item.id = record[:id]
-          item.name = record[:name]
-          item.age = record[:age]
+      def dump(entity)
+        {
+          id: entity.id,
+          name: entity.name,
+          age: entity.age,
+        }
+      end
+
+      def load(tuple)
+        factory.call do |entity|
+          entity.id = tuple[:id]
+          entity.name = tuple[:name]
+          entity.age = tuple[:age]
         end
       end
 
