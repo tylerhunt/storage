@@ -1,6 +1,9 @@
 module Storage
   module Repositories
     class Repository
+      Error = Class.new(StandardError)
+      NotFound = Class.new(Error)
+
       def initialize(adapter:, mapper:)
         self.adapter = adapter
         self.mapper = mapper
@@ -10,14 +13,21 @@ module Storage
         adapter.all.lazy.collect(&method(:load))
       end
 
+      def destroy(entity)
+        tuple = dump(entity)
+        adapter.delete tuple[:id]
+        self
+      end
+
       def find(id)
-        tuple = adapter.find(id)
+        tuple = adapter.retrieve(id)
+        raise NotFound unless tuple
         load(tuple)
       end
 
       def persist(entity)
         unless entity.id
-          insert entity
+          create entity
         else
           update entity
         end
@@ -36,7 +46,7 @@ module Storage
         mapper.dump(entity)
       end
 
-      def insert(entity)
+      def create(entity)
         tuple = dump(entity)
         adapter.insert tuple
         entity.id = tuple[:id]

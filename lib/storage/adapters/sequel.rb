@@ -9,8 +9,9 @@ module Storage
         dataset.all
       end
 
-      def find(id)
-        dataset.where(id: id).first
+      def delete(id)
+        find(id).delete
+        self
       end
 
       def insert(tuple)
@@ -18,14 +19,24 @@ module Storage
         self
       end
 
+      def retrieve(id)
+        find(id).first
+      end
+
       def update(id, tuple)
-        dataset.where(id: id).update tuple
+        find(id).update tuple
         self
       end
 
     protected
 
       attr_accessor :dataset
+
+    private
+
+      def find(id)
+        dataset.where(id: id)
+      end
     end
   end
 end
