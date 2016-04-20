@@ -2,6 +2,17 @@ module Storage
   module Adapters
     module Sequel
       class Adapter
+        Error = Class.new(StandardError)
+
+        UndefinedQuery = Class.new(Error) do
+          attr_accessor :name
+
+          def initialize(name)
+            self.name = name
+            super "adapter does not define query: #{name}"
+          end
+        end
+
         def initialize(dataset:)
           self.dataset = dataset
         end
@@ -18,6 +29,11 @@ module Storage
         def insert(tuple)
           tuple[:id] = dataset.insert(tuple)
           self
+        end
+
+        def query(name, *args)
+          raise UndefinedQuery, name unless respond_to?(name)
+          send name, *args
         end
 
         def retrieve(id)

@@ -1,5 +1,3 @@
-require 'storage/queries/all'
-
 module Storage
   module Repositories
     class Repository
@@ -12,7 +10,7 @@ module Storage
       end
 
       def all
-        query Queries::All
+        query :all
       end
 
       def destroy(entity)
@@ -37,11 +35,6 @@ module Storage
         self
       end
 
-      def query(query, *args)
-        tuples = query.new(adapter: adapter).call(*args)
-        tuples.lazy.collect(&method(:load))
-      end
-
     protected
 
       attr_accessor :adapter
@@ -59,14 +52,19 @@ module Storage
         entity.id = tuple[:id]
       end
 
+      def load(tuple)
+        mapper.load(tuple)
+      end
+
       def update(entity)
         tuple = dump(entity)
         id = tuple.delete(:id)
         adapter.update id, tuple
       end
 
-      def load(tuple)
-        mapper.load(tuple)
+      def query(name, *args)
+        tuples = adapter.query name, *args
+        tuples.lazy.collect(&method(:load))
       end
     end
   end

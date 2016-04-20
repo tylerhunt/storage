@@ -1,5 +1,4 @@
 require 'storage/mappers/user'
-require 'storage/queries/users/younger_than'
 
 require_relative 'repository'
 
@@ -17,7 +16,7 @@ module Storage
       end
 
       def younger_than(age:)
-        query Queries::Users::YoungerThan, age: age
+        query :younger_than, age: age
       end
     end
   end
